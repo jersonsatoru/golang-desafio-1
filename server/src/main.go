@@ -1,4 +1,4 @@
-package server
+package main
 
 import (
 	"context"
@@ -9,20 +9,24 @@ import (
 )
 
 type USDBRL struct {
-	Code       string    `json:"code"`
-	Codein     string    `json:"codein"`
-	Name       string    `json:"name"`
-	High       string    `json:"high"`
-	Low        string    `json:"low"`
-	VarBid     string    `json:"varBid"`
-	PctChange  string    `json:"pctChange"`
-	Bid        string    `json:"bid"`
-	Ask        string    `json:"ask"`
-	Timestamp  string    `json:"timestamp"`
-	CreateDate time.Time `json:"create_date"`
+	Code       string `json:"code"`
+	Codein     string `json:"codein"`
+	Name       string `json:"name"`
+	High       string `json:"high"`
+	Low        string `json:"low"`
+	VarBid     string `json:"varBid"`
+	PctChange  string `json:"pctChange"`
+	Bid        string `json:"bid"`
+	Ask        string `json:"ask"`
+	Timestamp  string `json:"timestamp"`
+	CreateDate string `json:"create_date"`
 }
 
-func StartServer() {
+type ResponseServiceURL struct {
+	USDBRL *USDBRL `json:"USDBRL"`
+}
+
+func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/cotacao", func(w http.ResponseWriter, r *http.Request) {
 		serviceURL := "https://economia.awesomeapi.com.br/json/last/USD-BRL"
@@ -46,8 +50,13 @@ func StartServer() {
 			panic(err)
 		}
 
-		var usdBrl *USDBRL
-		err = json.Unmarshal(data, usdBrl)
+		var responseServiceURL ResponseServiceURL
+		err = json.Unmarshal(data, &responseServiceURL)
+		if err != nil {
+			panic(err)
+		}
+
+		err = json.NewEncoder(w).Encode(map[string]interface{}{"bid": responseServiceURL.USDBRL.Bid})
 		if err != nil {
 			panic(err)
 		}
