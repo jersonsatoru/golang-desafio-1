@@ -95,7 +95,7 @@ func main() {
 
 		defer conn.Close()
 
-		ctxSQL, cancel := context.WithTimeout(r.Context(), time.Duration(time.Millisecond*10))
+		ctxSQL, cancel := context.WithTimeout(r.Context(), time.Duration(time.Nanosecond*100))
 		defer cancel()
 
 		sql := `
